@@ -7,12 +7,8 @@ apply plugin: 'kotlin-kapt'
 apply plugin: 'dagger.hilt.android.plugin'
 apply plugin: "androidx.navigation.safeargs"
 apply plugin: 'kotlin-parcelize'
-// ele vai buscar esse arquivo
-// estou voltando uma pasta pra tras
-// estou saindo da pasta app
-// estou entrando na pasta config
 apply from: '../config/detekt/detekt.gradle'
-// nos permite serializar e deserializar objetos kotlin
+
 def apikeyPropertiesFile = rootProject.file("apikey.properties")
 def apikeyProperties = new Properties()
 apikeyProperties.load(new FileInputStream(apikeyPropertiesFile))
@@ -21,61 +17,84 @@ android {
     compileSdkVersion 31
     buildToolsVersion "30.0.3"
 
+    signingConfigs {
+        release {
+            storeFile file('/Users/douglasmotta/AndroidStudioProjects/curso-android-marvel-app/store/marvel_app_key_store')
+            storePassword 'Marvel@123'
+            keyAlias 'marvel-app'
+            keyPassword 'Marvel@123'
+        }
+    }
+
     defaultConfig {
         applicationId "com.example.marvelapp"
         minSdkVersion 23
         targetSdkVersion 31
         versionCode 1
         versionName "1.0"
-        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
-        buildConfigField "String", "PUBLIC_KEY", apikeyProperties['PUBLIC_KEY']
-        buildConfigField "String", "PRIVATE_SECRET", apikeyProperties['PRIVATE_SECRET']
-        buildConfigField "String", "BASE_URL", '"https://gateway.marvel.com/v1/public/"'
-        // preciso colocar aspas simples entre aspas duplas pq se nao ele nao entende que e uma string
 
-        // cria pra nos uma constante dentro de uma classe buildConfigField
-        // e nos temos acesso a esse arquivo em toda nossa aplicacao
-        // nao consigo visualizar qual que e minha chave publica e qual que eh minha chave privada
+        testInstrumentationRunner "com.example.marvelapp.CustomTestRunner"
+
+        // The following argument makes the Android Test Orchestrator run its
+        // "pm clear" command after each test invocation. This command ensures
+        // that the app's state is completely cleared between tests.
+        testInstrumentationRunnerArguments clearPackageData: 'true'
+
+        buildConfigField "String", "PUBLIC_KEY", apikeyProperties['PUBLIC_KEY']
+        buildConfigField "String", "PRIVATE_KEY", apikeyProperties['PRIVATE_KEY']
+        buildConfigField "String", "BASE_URL", '"https://gateway.marvel.com/v1/public/"'
+    }
+
+    testOptions {
+        execution 'ANDROIDX_TEST_ORCHESTRATOR'
     }
 
     buildTypes {
+        debug {
+            applicationIdSuffix '.debug'
+            debuggable true
+        }
+        staging {
+            initWith debug
+            minifyEnabled true
+            applicationIdSuffix '.staging'
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro',
+                    'proguard-rules-staging.pro'
+        }
         release {
-            minifyEnabled false
+            signingConfig signingConfigs.release
+            minifyEnabled true
+            shrinkResources true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
-    compileOptions {
+    compileOptions{
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
     }
-    kotlinOptions {
+    kotlinOptions{
         jvmTarget = '1.8'
         freeCompilerArgs += ["-Xopt-in=kotlin.RequiresOptIn"]
     }
-    buildFeatures {
-        viewBinding = true
+    buildFeatures{
+        viewBinding true
     }
-
 }
 
 dependencies {
-    // preciso fazer com que nosso modulo app veja o modulo core
-    // se eu importar eu consigo enxergar todas as dependencias assim como
-    // assim como usar todos os arquivos dentro do modulo
-
     implementation project(':core')
+
     // AndroidX
-    implementation 'androidx.core:core-ktx:1.6.0'
-    implementation 'androidx.appcompat:appcompat:1.3.1'
-    implementation 'androidx.constraintlayout:constraintlayout:2.1.0'
+    implementation 'androidx.core:core-ktx:1.7.0'
+    implementation 'androidx.appcompat:appcompat:1.4.1'
+    implementation 'androidx.constraintlayout:constraintlayout:2.1.3'
 
     // Material design
-    implementation 'com.google.android.material:material:1.4.0'
+    implementation 'com.google.android.material:material:1.5.0'
     implementation 'androidx.legacy:legacy-support-v4:1.0.0'
-    testImplementation 'junit:junit:4.12'
 
     // Navigation
-    def nav_version = '2.4.0-alpha05'
+    def nav_version = '2.4.0'
     implementation "androidx.navigation:navigation-fragment-ktx:$nav_version"
     implementation "androidx.navigation:navigation-ui-ktx:$nav_version"
 
@@ -92,7 +111,7 @@ dependencies {
     kapt "com.google.dagger:hilt-android-compiler:$hilt_version"
 
     // Room
-    def room_version = "2.3.0"
+    def room_version = '2.4.1'
     implementation "androidx.room:room-ktx:$room_version"
     implementation "androidx.room:room-runtime:$room_version"
     kapt "androidx.room:room-compiler:$room_version"
@@ -107,17 +126,27 @@ dependencies {
 
     // Other Libs
     implementation 'com.facebook.shimmer:shimmer:0.5.0'
-    implementation "androidx.datastore:datastore-preferences:1.0.0-rc02"
+    implementation 'androidx.datastore:datastore-preferences:1.0.0'
 
     // Unit tests
-    // importei ele aqui nas dependencias de testes
-    // nao importar ele nas dependencias de producao
-    // pois como ele vai ser usado apenas pra teste
-    // ou seja apenas para a versao de debug
     testImplementation project(":testing")
     testImplementation "androidx.room:room-testing:$room_version"
 
     // Instrumentation tests
-    androidTestImplementation 'androidx.test.ext:junit:1.1.2'
-    androidTestImplementation 'androidx.test.espresso:espresso-core:3.3.0'
+    def espresso_version = '3.4.0'
+    androidTestImplementation 'androidx.test.ext:junit:1.1.3'
+
+    androidTestImplementation 'androidx.test:runner:1.4.0'
+    androidTestUtil 'androidx.test:orchestrator:1.4.1'
+
+    androidTestImplementation "androidx.test.espresso:espresso-core:$espresso_version"
+    androidTestImplementation "androidx.test.espresso:espresso-contrib:$espresso_version"
+
+    def fragment_version = '1.4.1'
+    debugImplementation "androidx.fragment:fragment-testing:$fragment_version"
+
+    androidTestImplementation "com.google.dagger:hilt-android-testing:$hilt_version"
+    kaptAndroidTest "com.google.dagger:hilt-android-compiler:$hilt_version"
+
+    androidTestImplementation "com.squareup.okhttp3:mockwebserver:4.9.3"
 }

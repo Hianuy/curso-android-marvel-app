@@ -1,6 +1,5 @@
 plugins {
     id 'java-library'
-    id 'org.jetbrains.kotlin.jvm'
     id 'kotlin'
 }
 
@@ -11,31 +10,27 @@ java {
 
 dependencies {
 
-    // o que significa o api
-    // significa que o modulo core tem acesso a essas dependencias
-    // e todo mundo que utiliza o modulo core vai ter acesso a essas dependencias
     // OkHttp
     api(platform("com.squareup.okhttp3:okhttp-bom:4.9.0"))
     api("com.squareup.okhttp3:okhttp")
     api("com.squareup.okhttp3:logging-interceptor")
+
     // Retrofit
     def retrofit_version = '2.9.0'
     api "com.squareup.retrofit2:retrofit:$retrofit_version"
     api "com.squareup.retrofit2:converter-gson:$retrofit_version"
-    // gson
+
+    // Gson
     api 'com.google.code.gson:gson:2.8.6'
 
+    // Paging3 Common
     implementation "androidx.paging:paging-common:$paging_version"
-    // ela nao traz classes que estao fortemente ligadas com framework do android
-    // vamos ter apenas classes puras aqui, sem nenhuma dependencia.
 
-
-    // Javax inject
-    // ele vai apenas deixar com que eu use aquelas anotacoes @ inject
-    // trouxe essa aqui pq vamos trabalhar com javax hilt
-    // isolando o maximo o meu core de dependencia do meu framework do android
+    // Javax Inject
     implementation "javax.inject:javax.inject:1"
 
-    // Coroutine core
+    // Coroutines core
     api "org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutines_version"
+
+    testImplementation project(":testing")
 }

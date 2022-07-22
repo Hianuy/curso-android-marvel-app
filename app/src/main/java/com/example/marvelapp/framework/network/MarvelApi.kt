@@ -1,18 +1,30 @@
 package com.example.marvelapp.framework.network
 
+import com.example.marvelapp.framework.network.response.CharacterResponse
+import com.example.marvelapp.framework.network.response.ComicResponse
 import com.example.marvelapp.framework.network.response.DataWrapperResponse
+import com.example.marvelapp.framework.network.response.EventResponse
 import retrofit2.http.GET
+import retrofit2.http.Path
 import retrofit2.http.QueryMap
 
 interface MarvelApi {
+
     @GET("characters")
-    // ele automaticamente vai fazer o parser utilizando gson
-    // como nos informamos pro retrofit pra ele poder fazer o mapeamento automatico
-    // converter esse metodo aqui do kotlin pra um querie parameter dentro do url
-    // temos que passar aqui essa anotacao
-    // o retrofit automaticamente vai converter esses dados aqui
     suspend fun getCharacters(
         @QueryMap
         queries: Map<String, String>
-    ): DataWrapperResponse
+    ): DataWrapperResponse<CharacterResponse>
+
+    @GET("characters/{characterId}/comics")
+    suspend fun getComics(
+        @Path("characterId")
+        characterId: Int
+    ): DataWrapperResponse<ComicResponse>
+
+    @GET("characters/{characterId}/events")
+    suspend fun getEvents(
+        @Path("characterId")
+        characterId: Int
+    ): DataWrapperResponse<EventResponse>
 }

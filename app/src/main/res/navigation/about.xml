@@ -2,8 +2,7 @@
 <navigation xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/item_about"
-    android:label="@string/about_screen_title"
+    android:id="@+id/about"
     app:startDestination="@id/aboutFragment">
 
     <fragment

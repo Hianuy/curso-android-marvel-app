@@ -9,15 +9,7 @@
 
     <include
         android:id="@+id/include_view_characters_loading_state"
-        layout="@layout/include_view_characters_loading" />
-    <!--Quando eu trabalho com estados na minha tela ou seja,tenho o estado de sucesso -->
-    <!--Quando eu tenho o estado de loading, quando eu tenho o estado de erro.-->
-    <!--O legal trabalhar com um viewGrup chamado view fliper-->
-    <!--Mas podemos trabalhar com qualquer outro view grupo setando visibilidade-->
-    <!--Mas o view fliper trabalha com posicoes e mostra uma view de cada vez  -->
-    <!--Trocamos de linear layout pra view Flipper-->
-    <!--E por padrao ele mostra apenas um filho-->
-    <!--View flipper sempre mostra o filho da posicao 0 primeiro-->
+        layout="@layout/include_view_characters_loading_state" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recycler_characters"
@@ -29,5 +21,6 @@
 
     <include
         android:id="@+id/include_view_characters_error_state"
-        layout="@layout/include_view_characters_error_state" />
+        layout="@layout/include_error_view" />
+
 </ViewFlipper>

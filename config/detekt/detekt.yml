@@ -691,8 +691,6 @@ style:
     active: false
   NestedClassesVisibility:
     active: true
-  NewLineAtEndOfFile:
-    active: false
   NoTabs:
     active: false
   ObjectLiteralToLambda:
